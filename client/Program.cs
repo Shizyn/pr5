@@ -14,6 +14,21 @@ namespace client
         {
             OnSettings();
         }
+
+        static void SetCommand()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            string Command = Console.ReadLine();
+
+            if (Command == "/config")
+            {
+                File.Delete(Directory.GetCurrentDirectory() + "/.config");
+                OnSettings();
+            }
+            else if (Command == "/connect") ;
+            else if (Command == "/status") ;
+            else if (Command == "/help") Help();
+        }
         static void OnSettings()
         {
             string Path = Directory.GetCurrentDirectory() + "/.config";
