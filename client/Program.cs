@@ -16,6 +16,8 @@ namespace client
         static void Main(string[] args)
         {
             OnSettings();
+            Thread tCheckToken = new Thread(CheckToken);
+            tCheckToken.Start();
             while (true)
                 SetCommand();
         }
@@ -43,7 +45,7 @@ namespace client
                               $"duration: {Duration}");
         }
 
-        static void ChekToken()
+        static void CheckToken()
         {
             while (true)
             {
@@ -67,26 +69,18 @@ namespace client
 
                     if (Socket.Connected)
                     {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Connection to server successful");
 
-                        Socket.Send(Encoding.UTF8.GetBytes("/token"));
+                        Socket.Send(Encoding.UTF8.GetBytes(ClientToken));
 
                         byte[] Bytes = new byte[10485760];
                         int ByteRec = Socket.Receive(Bytes);
 
                         string Response = Encoding.UTF8.GetString(Bytes, 0, ByteRec);
-                        if (Response == "/limit")
+                        if (Response == "/disconect")
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("There is not enough space on the license server");
-                        }
-                        else
-                        {
-                            ClientToken = Response;
-                            ClientDateConnection = DateTime.Now;
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Received connection token: " + ClientToken);
+                            Console.WriteLine("There client is disconect from the server");
+                            ClientToken = String.Empty;
                         }
                     }
                 }
