@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace client
 {
@@ -40,6 +41,58 @@ namespace client
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($"Client: {ClientToken}, time connection: {ClientDateConnection.ToString("HH:mm:ss dd.MM")}, " +
                               $"duration: {Duration}");
+        }
+
+        static void ChekToken()
+        {
+            while (true)
+            {
+                if (ClientToken != "")
+                {
+                    IPEndPoint EndPoint = new IPEndPoint(ServerIPAddress, ServerPort);
+                    Socket Socket = new Socket(
+                        AddressFamily.InterNetwork,
+                        SocketType.Stream,
+                        ProtocolType.Tcp);
+
+                    try
+                    {
+                        Socket.Connect(EndPoint);
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Error: " + exp.Message);
+                    }
+
+                    if (Socket.Connected)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("Connection to server successful");
+
+                        Socket.Send(Encoding.UTF8.GetBytes("/token"));
+
+                        byte[] Bytes = new byte[10485760];
+                        int ByteRec = Socket.Receive(Bytes);
+
+                        string Response = Encoding.UTF8.GetString(Bytes, 0, ByteRec);
+                        if (Response == "/limit")
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("There is not enough space on the license server");
+                        }
+                        else
+                        {
+                            ClientToken = Response;
+                            ClientDateConnection = DateTime.Now;
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Received connection token: " + ClientToken);
+                        }
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+            
         }
 
         static void ConnectServer()
