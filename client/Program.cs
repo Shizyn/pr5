@@ -49,7 +49,7 @@ namespace client
         {
             while (true)
             {
-                if (ClientToken != "")
+                if (!String.IsNullOrEmpty(ClientToken))
                 {
                     IPEndPoint EndPoint = new IPEndPoint(ServerIPAddress, ServerPort);
                     Socket Socket = new Socket(
@@ -96,7 +96,6 @@ namespace client
                 AddressFamily.InterNetwork,
                 SocketType.Stream,
                 ProtocolType.Tcp);
-
             try
             {
                 Socket.Connect(EndPoint);
@@ -127,7 +126,7 @@ namespace client
                 {
                     ClientToken = Response;
                     ClientDateConnection = DateTime.Now;
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Received connection token: " + ClientToken);
                 }
             }
@@ -136,7 +135,7 @@ namespace client
         static void Help()
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Commands to the server:");
+            Console.WriteLine("Commands to the clients:");
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("/config");
